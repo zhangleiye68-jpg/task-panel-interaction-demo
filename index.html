@@ -159,28 +159,79 @@
   <body>
     <main class="panel" aria-label="Interactive task list">
       <header>
-        <h2>Today</h2>
+        <h2 id="section-title"></h2>
         <span class="count" id="count"></span>
       </header>
       <ul id="tasks" aria-label="Tasks"></ul>
       <form class="composer" id="add-form">
         <button class="add" type="submit" aria-label="Add task">+</button>
-        <input id="new-task" name="task" placeholder="Add a task..." aria-label="New task" maxlength="100" autocomplete="off" />
+        <input id="new-task" name="task" aria-label="New task" maxlength="100" autocomplete="off" />
       </form>
-      <button class="reset" id="reset-demo" type="button">Reset demo</button>
+      <button class="reset" id="reset-demo" type="button"></button>
     </main>
     <script>
-      const STORAGE_KEY = "buildin-task-panel-demo-v1";
-      const initialTasks = [
-        { id: "parcel", name: "Collect parcel from locker", meta: "Personal", done: false },
-        { id: "luggage", name: "Pack my luggage", meta: "Personal", done: false },
-        { id: "blog", name: "Write blog post", meta: "Work", done: false },
-        { id: "calendar", name: "Plan content calendar", meta: "Work", done: false },
-        { id: "video", name: "Film a new video", meta: "Work", done: false },
-        { id: "bill", name: "Pay credit card bill", meta: "Personal", done: false }
-      ];
+      const searchParams = new URLSearchParams(location.search);
+      const locale = searchParams.get("lang") === "ru" ? "ru" : "en";
+      const copy = {
+        en: {
+          title: "My Tasks · Interactive Demo",
+          panel: "Interactive task list",
+          today: "Today",
+          tasksLabel: "Tasks",
+          addTask: "Add task",
+          newTask: "New task",
+          addPlaceholder: "Add a task...",
+          reset: "Reset demo",
+          remaining: count => `${count} remaining`,
+          complete: "Complete: ",
+          incomplete: "Mark incomplete: ",
+          newMeta: "New task",
+          tasks: [
+            { id: "parcel", name: "Collect parcel from locker", meta: "Personal" },
+            { id: "luggage", name: "Pack my luggage", meta: "Personal" },
+            { id: "blog", name: "Write blog post", meta: "Work" },
+            { id: "calendar", name: "Plan content calendar", meta: "Work" },
+            { id: "video", name: "Film a new video", meta: "Work" },
+            { id: "bill", name: "Pay credit card bill", meta: "Personal" }
+          ]
+        },
+        ru: {
+          title: "Мои задачи · интерактивное демо",
+          panel: "Интерактивный список задач",
+          today: "Сегодня",
+          tasksLabel: "Задачи",
+          addTask: "Добавить задачу",
+          newTask: "Новая задача",
+          addPlaceholder: "Добавить задачу...",
+          reset: "Сбросить демо",
+          remaining: count => `Осталось: ${count}`,
+          complete: "Выполнить: ",
+          incomplete: "Вернуть в список: ",
+          newMeta: "Новая задача",
+          tasks: [
+            { id: "parcel", name: "Забрать посылку из постамата", meta: "Личное" },
+            { id: "luggage", name: "Собрать чемодан", meta: "Личное" },
+            { id: "blog", name: "Написать статью для блога", meta: "Работа" },
+            { id: "calendar", name: "Составить контент-план", meta: "Работа" },
+            { id: "video", name: "Снять новое видео", meta: "Работа" },
+            { id: "bill", name: "Оплатить счёт по кредитной карте", meta: "Личное" }
+          ]
+        }
+      }[locale];
+      const STORAGE_KEY = locale === "ru" ? "buildin-task-panel-demo-ru-v1" : "buildin-task-panel-demo-v1";
+      const initialTasks = copy.tasks.map(task => ({ ...task, done: false }));
 
-      const resetRequested = new URLSearchParams(location.search).get("reset") === "1";
+      document.documentElement.lang = locale;
+      document.title = copy.title;
+      document.querySelector("main").setAttribute("aria-label", copy.panel);
+      document.getElementById("section-title").textContent = copy.today;
+      document.getElementById("tasks").setAttribute("aria-label", copy.tasksLabel);
+      document.querySelector(".add").setAttribute("aria-label", copy.addTask);
+      document.getElementById("new-task").setAttribute("aria-label", copy.newTask);
+      document.getElementById("new-task").placeholder = copy.addPlaceholder;
+      document.getElementById("reset-demo").textContent = copy.reset;
+
+      const resetRequested = searchParams.get("reset") === "1";
       if (resetRequested) {
         try { localStorage.removeItem(STORAGE_KEY); } catch { /* Storage may be unavailable in an embed. */ }
         const cleanUrl = new URL(location.href);
@@ -230,7 +281,7 @@
       function updateRow(row, task) {
         row.classList.toggle("done", task.done);
         const button = row.querySelector(".check");
-        button.setAttribute("aria-label", (task.done ? "Mark incomplete: " : "Complete: ") + task.name);
+        button.setAttribute("aria-label", (task.done ? copy.incomplete : copy.complete) + task.name);
         button.setAttribute("aria-pressed", String(task.done));
         row.querySelector(".task-name").textContent = task.name;
         row.querySelector(".task-meta").textContent = task.meta;
@@ -272,7 +323,7 @@
         }
 
         const remaining = tasks.filter(task => !task.done).length;
-        count.textContent = `${remaining} remaining`;
+        count.textContent = copy.remaining(remaining);
       }
 
       function toggleTask(id) {
@@ -292,7 +343,7 @@
         event.preventDefault();
         const name = input.value.trim();
         if (!name) return;
-        tasks.push({ id: crypto.randomUUID(), name, meta: "New task", done: false,
+        tasks.push({ id: crypto.randomUUID(), name, meta: copy.newMeta, done: false,
           order: Math.max(-1, ...tasks.map(task => task.order)) + 1, completedOrder: null });
         input.value = "";
         save();
