@@ -4,85 +4,45 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <title>Buildin Task Panel · Demo</title>
+    <title>My Tasks · Interactive Demo</title>
     <style>
       :root {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        color: #172126;
-        background: #f6f8f7;
+        font-family: ui-sans-serif, -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+        color: #37352f;
+        background: #fff;
         font-synthesis: none;
       }
 
       * { box-sizing: border-box; }
 
-      body {
-        margin: 0;
-        padding: 24px;
-      }
+      body { margin: 0; }
+      button, input { font: inherit; }
 
       .panel {
-        width: min(100%, 440px);
-        min-height: 520px;
-        margin: 0 auto;
-        padding: 27px 25px 24px;
-        border: 1px solid #e5ebe8;
-        border-radius: 26px;
+        width: 100%;
+        padding: 0 1px;
         background: #fff;
-        box-shadow: 0 16px 50px rgb(35 61 50 / 7%);
-      }
-
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 27px;
-        color: #5e7167;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: .09em;
-        text-transform: uppercase;
-      }
-
-      .brand-mark {
-        display: inline-grid;
-        width: 19px;
-        height: 19px;
-        place-items: center;
-        border-radius: 6px;
-        background: #177953;
-        color: #fff;
-        font-size: 13px;
-        letter-spacing: 0;
       }
 
       header {
         display: flex;
+        align-items: baseline;
         justify-content: space-between;
-        align-items: end;
         gap: 16px;
-        margin-bottom: 24px;
+        margin-bottom: 14px;
       }
 
-      h1 {
+      h2 {
         margin: 0;
-        font-size: 31px;
-        line-height: 1.05;
-        letter-spacing: -.05em;
-      }
-
-      .subtitle {
-        margin: 8px 0 0;
-        color: #829087;
-        font-size: 13px;
+        font-size: 21px;
+        line-height: 1.4;
+        font-weight: 650;
+        letter-spacing: -.025em;
       }
 
       .count {
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: #edf5f0;
-        color: #24744e;
-        font-size: 12px;
-        font-weight: 700;
+        color: #9b9a97;
+        font-size: 13px;
         white-space: nowrap;
       }
 
@@ -96,117 +56,100 @@
         position: relative;
         display: flex;
         align-items: flex-start;
-        gap: 12px;
-        min-height: 58px;
-        padding: 10px 0;
-        border-bottom: 1px solid #edf0ee;
+        gap: 13px;
+        min-height: 59px;
+        padding: 11px 2px 10px;
+        border-bottom: 1px solid #efefed;
         background: #fff;
         cursor: pointer;
         touch-action: manipulation;
       }
 
-      li:last-child { border-bottom: 0; }
-
       .check {
         display: grid;
-        flex: 0 0 25px;
-        width: 25px;
-        height: 25px;
+        flex: 0 0 19px;
+        width: 19px;
+        height: 19px;
         place-items: center;
         margin-top: 2px;
-        border: 1.7px solid #b9c8be;
-        border-radius: 50%;
+        padding: 0;
+        border: 1.5px solid #aaa9a4;
+        border-radius: 4px;
         background: #fff;
         color: transparent;
         cursor: pointer;
-        transition: background .15s ease, border-color .15s ease, transform .15s ease;
+        transition: background .16s ease, border-color .16s ease, transform .16s ease;
       }
 
-      .check:hover { border-color: #177953; transform: scale(1.05); }
-      .check:focus-visible, .add:focus-visible, #new-task:focus-visible { outline: 3px solid #8fd5ab; outline-offset: 2px; }
+      .check:hover { border-color: #2e805e; transform: scale(1.06); }
+      .check:focus-visible, .add:focus-visible, .reset:focus-visible, #new-task:focus-visible {
+        outline: 2px solid #2e805e;
+        outline-offset: 3px;
+      }
 
       .check[aria-pressed="true"] {
-        border-color: #177953;
-        background: #177953;
+        border-color: #2e805e;
+        background: #2e805e;
         color: #fff;
       }
 
-      .check svg { width: 15px; height: 15px; }
+      .check svg { width: 14px; height: 14px; }
 
-      .task-text { min-width: 0; padding-top: 3px; }
-      .task-name { display: block; font-size: 15px; font-weight: 560; line-height: 1.3; transition: color .2s ease; }
-      .task-meta { display: block; margin-top: 4px; color: #92a198; font-size: 11px; transition: opacity .2s ease; }
+      .task-text { min-width: 0; }
+      .task-name { display: block; font-size: 15px; font-weight: 510; line-height: 1.34; transition: color .2s ease; }
+      .task-meta { display: block; margin-top: 3px; color: #9b9a97; font-size: 11px; line-height: 1.3; transition: opacity .2s ease; }
 
-      li.done .task-name { color: #a1aea5; text-decoration: line-through; text-decoration-thickness: 1.5px; }
-      li.done .task-meta { opacity: .55; }
+      li.done .task-name { color: #aaa9a4; text-decoration: line-through; text-decoration-thickness: 1px; }
+      li.done .task-meta { opacity: .64; }
 
       .composer {
         display: flex;
-        gap: 10px;
         align-items: center;
-        margin-top: 20px;
-        padding: 9px 10px 9px 15px;
-        border: 1px solid #e5ebe8;
-        border-radius: 14px;
-        background: #fbfcfb;
+        gap: 12px;
+        min-height: 46px;
+        padding: 8px 2px;
       }
 
       #new-task {
         flex: 1;
         min-width: 0;
+        padding: 0;
         border: 0;
-        background: transparent;
-        color: #172126;
-        font: inherit;
-        font-size: 13px;
+        outline: 0;
+        background: none;
+        color: #37352f;
+        font-size: 14px;
       }
 
-      #new-task::placeholder { color: #a1aea5; }
-      #new-task:focus { outline: none; }
+      #new-task::placeholder { color: #9b9a97; }
 
       .add {
         display: grid;
-        flex: 0 0 29px;
-        width: 29px;
-        height: 29px;
+        flex: 0 0 19px;
+        width: 19px;
+        height: 19px;
         place-items: center;
+        padding: 0;
         border: 0;
-        border-radius: 9px;
-        background: #177953;
-        color: #fff;
-        font-size: 22px;
+        background: none;
+        color: #9b9a97;
+        font-size: 24px;
+        font-weight: 300;
         line-height: 1;
         cursor: pointer;
       }
 
-      .note {
-        margin: 17px 0 0;
-        color: #a4afa8;
-        font-size: 10px;
-        line-height: 1.4;
-        text-align: center;
-      }
-
-      .note button {
-        padding: 0 2px;
+      .reset {
+        margin-top: 15px;
+        padding: 0;
         border: 0;
         background: none;
-        color: #5e806d;
-        font: inherit;
-        text-decoration: underline;
+        color: #aaa9a4;
+        font-size: 11px;
         cursor: pointer;
       }
 
-      @media (max-width: 480px) {
-        body { padding: 0; background: #fff; }
-        .panel {
-          min-height: 100vh;
-          padding: 26px 22px 24px;
-          border: 0;
-          border-radius: 0;
-          box-shadow: none;
-        }
-      }
+      .reset:hover { color: #64635e; text-decoration: underline; }
 
       @media (prefers-reduced-motion: reduce) {
         .check, .task-name, .task-meta { transition: none; }
@@ -214,21 +157,17 @@
     </style>
   </head>
   <body>
-    <main class="panel" aria-label="Buildin task panel demo">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">B</span> Buildin</div>
+    <main class="panel" aria-label="Interactive task list">
       <header>
-        <div>
-          <h1>Today</h1>
-          <p class="subtitle">The important things, without the clutter.</p>
-        </div>
+        <h2>Today</h2>
         <span class="count" id="count"></span>
       </header>
       <ul id="tasks" aria-label="Tasks"></ul>
       <form class="composer" id="add-form">
-        <input id="new-task" name="task" placeholder="Add a task..." aria-label="New task" maxlength="100" autocomplete="off" />
         <button class="add" type="submit" aria-label="Add task">+</button>
+        <input id="new-task" name="task" placeholder="Add a task..." aria-label="New task" maxlength="100" autocomplete="off" />
       </form>
-      <p class="note">Interactive prototype · Sample tasks are stored on this device. <button id="reset-demo" type="button">Reset demo</button></p>
+      <button class="reset" id="reset-demo" type="button">Reset demo</button>
     </main>
     <script>
       const STORAGE_KEY = "buildin-task-panel-demo-v1";
@@ -333,7 +272,7 @@
         }
 
         const remaining = tasks.filter(task => !task.done).length;
-        count.textContent = `${remaining} left`;
+        count.textContent = `${remaining} remaining`;
       }
 
       function toggleTask(id) {
