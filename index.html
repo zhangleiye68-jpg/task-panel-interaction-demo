@@ -187,6 +187,16 @@
         text-align: center;
       }
 
+      .note button {
+        padding: 0 2px;
+        border: 0;
+        background: none;
+        color: #5e806d;
+        font: inherit;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
       @media (max-width: 480px) {
         body { padding: 0; background: #fff; }
         .panel {
@@ -218,7 +228,7 @@
         <input id="new-task" name="task" placeholder="Add a task..." aria-label="New task" maxlength="100" autocomplete="off" />
         <button class="add" type="submit" aria-label="Add task">+</button>
       </form>
-      <p class="note">Interactive prototype · Sample tasks are stored on this device.</p>
+      <p class="note">Interactive prototype · Sample tasks are stored on this device. <button id="reset-demo" type="button">Reset demo</button></p>
     </main>
     <script>
       const STORAGE_KEY = "buildin-task-panel-demo-v1";
@@ -256,6 +266,7 @@
       const count = document.getElementById("count");
       const form = document.getElementById("add-form");
       const input = document.getElementById("new-task");
+      const resetButton = document.getElementById("reset-demo");
       const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
       function save() {
@@ -347,6 +358,12 @@
         input.value = "";
         save();
         render({ animate: true });
+      });
+
+      resetButton.addEventListener("click", () => {
+        const url = new URL(location.href);
+        url.searchParams.set("reset", "1");
+        location.assign(url);
       });
 
       render();
